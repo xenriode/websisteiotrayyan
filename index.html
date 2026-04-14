@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RyannProject - Smart IoT Nexus</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Great+Vibes&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background-color: #050505;
+            min-height: 100vh;
+            color: white;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Background Layer dengan Blur dan Gelap */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://69d45ce76a5d9ea952a754f8.imgix.net/snowboard.jpg');
+            background-size: cover;
+            background-position: center;
+            filter: brightness(0.3) blur(12px); 
+            transform: scale(1.1); 
+            z-index: -1;
+        }
+
+        /* Glassmorphism Panel Elegan */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s ease;
+        }
+        
+        .glass-panel:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+        }
+
+        /* Typography */
+        .cursive-logo {
+            font-family: 'Great Vibes', cursive;
+            font-size: 5rem;
+            line-height: 0.8;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #ffffff, #a0c4ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-name {
+            font-size: 1.5rem;
+            letter-spacing: 5px;
+            font-weight: 600;
+            text-transform: uppercase;
+            opacity: 0.9;
+        }
+
+        /* Inputs & Buttons */
+        input, select {
+            background: rgba(0, 0, 0, 0.3) !important;
+            border: 1px solid rgba(255, 255, 255, 0.15) !important;
+            color: white !important;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            background: rgba(0, 0, 0, 0.5) !important;
+            border-color: #4182f3 !important;
+            outline: none;
+            box-shadow: 0 0 15px rgba(65, 130, 243, 0.3);
+        }
+        
+        select option { background: #111; color: #fff; }
+
+        .btn-blue {
+            background: linear-gradient(135deg, #4182f3, #2b5db8);
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-blue:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(65, 130, 243, 0.5);
+            filter: brightness(1.1);
+        }
+        .btn-blue:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* Slider / Dimmer Custom */
+        input[type=range] {
+            -webkit-appearance: none; width: 100%; background: transparent; height: 30px;
+        }
+        input[type=range]:focus { outline: none; }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 6px; cursor: pointer; background: rgba(255, 255, 255, 0.1); border-radius: 3px;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            height: 20px; width: 20px; border-radius: 50%; background: #4182f3; cursor: pointer;
+            -webkit-appearance: none; margin-top: -7px; box-shadow: 0 0 10px rgba(65,130,243,0.8); transition: transform 0.2s;
+        }
+        input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+
+        /* Terminal Log */
+        .log-panel {
+            height: 200px; overflow-y: auto; font-family: monospace;
+            font-size: 11px; color: #aaa; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 12px;
+        }
+        .log-panel::-webkit-scrollbar { width: 6px; }
+        .log-panel::-webkit-scrollbar-thumb { background: #4182f3; border-radius: 6px; }
+        .log-line { border-bottom: 1px solid rgba(255,255,255,0.05); padding: 4px 0; }
+
+        /* Animations */
+        .hidden-page { display: none !important; opacity: 0; }
+        .animate-slide { animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(40px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        
+        /* Switch Card Active State */
+        .switch-active {
+            background: rgba(65, 130, 243, 0.15);
+            border-color: #4182f3;
+            box-shadow: inset 0 0 20px rgba(65, 130, 243, 0.2);
+        }
+        .switch-active .fa-power-off { color: #4182f3; text-shadow: 0 0 15px #4182f3; }
+        .switch-inactive .fa-power-off { color: #555; }
+    </style>
+</head>
+<body class="flex items-center justify-center p-4">
+
+    <div id="loginPage" class="w-full max-w-md text-center animate-slide">
+        <div class="cursive-logo">Ry</div>
+        <div class="brand-name mb-8">RyannProject</div>
+        
+        <div class="glass-panel p-8 space-y-5 text-left">
+            <h2 class="text-center text-sm uppercase tracking-widest opacity-70 mb-4 border-b border-white/10 pb-4">System Uplink</h2>
+            <div>
+                <label class="text-[10px] uppercase tracking-widest block mb-1 opacity-70">Firebase API Key</label>
+                <input type="password" id="apiKeyInput" class="w-full p-3 rounded-xl text-sm" placeholder="AIzaSy...">
+            </div>
+            <div>
+                <label class="text-[10px] uppercase tracking-widest block mb-1 opacity-70">Database URL</label>
+                <input type="text" id="dbUrlInput" class="w-full p-3 rounded-xl text-sm" placeholder="https://your-db.firebaseio.com">
+            </div>
+            <div>
+                <label class="text-[10px] uppercase tracking-widest block mb-1 opacity-70">Node Path</label>
+                <input type="text" id="dbPathInput" class="w-full p-3 rounded-xl text-sm" placeholder="iot/kelas8" value="iot/kelas8">
+            </div>
+            <button id="btnLogin" class="btn-blue w-full py-3.5 rounded-xl text-sm font-semibold tracking-wider uppercase mt-4">
+                <i class="fas fa-sign-in-alt mr-2"></i> Access Dashboard
+            </button>
+        </div>
+    </div>
+
+    <div id="dashboardPage" class="hidden-page w-full max-w-7xl flex flex-col pt-8 pb-12">
+        
+        <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+            <div class="flex items-center gap-4">
+                <div class="cursive-logo !text-4xl !mb-0">Ry</div>
+                <div>
+                    <div class="brand-name !text-lg !mb-0 !tracking-[3px]">RyannProject</div>
+                    <div class="text-[10px] uppercase tracking-[3px] opacity-50">Smart Educational IoT</div>
+                </div>
+            </div>
+            <div class="flex gap-3">
+                <div class="glass-panel px-4 py-2 flex items-center gap-2 rounded-full border-white/10">
+                    <span id="bleDot" class="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_8px_#ef4444]"></span>
+                    <span id="bleText" class="text-[10px] font-bold uppercase tracking-wider">BLE Off</span>
+                </div>
+                <div class="glass-panel px-4 py-2 flex items-center gap-2 rounded-full border-white/10">
+                    <span id="dbDot" class="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_8px_#ef4444]"></span>
+                    <span id="dbText" class="text-[10px] font-bold uppercase tracking-wider">DB Off</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 w-full">
+            
+            <div class="lg:col-span-4 flex flex-col gap-6">
+                <div class="glass-panel p-6">
+                    <h3 class="text-xs opacity-70 mb-4 uppercase tracking-[0.2em] flex items-center gap-2">
+                        <i class="fab fa-bluetooth"></i> Micro:bit Link
+                    </h3>
+                    <div class="flex gap-2">
+                        <button id="btnConnectBle" class="btn-blue flex-1 py-3 rounded-xl text-xs font-semibold uppercase tracking-wider">Connect</button>
+                        <button id="btnDisconnectBle" disabled class="bg-red-500/20 border border-red-500/50 hover:bg-red-500 flex-1 py-3 rounded-xl text-xs font-semibold uppercase tracking-wider transition">Disconnect</button>
+                    </div>
+                </div>
+
+                <div class="glass-panel p-6 relative">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xs opacity-70 uppercase tracking-[0.2em] flex items-center gap-2">
+                            <i class="fas fa-tools"></i> Widget Builder
+                        </h3>
+                        <button id="btnCancelEdit" class="hidden bg-red-500 text-white text-[9px] px-2 py-1 rounded uppercase tracking-wider">Batal</button>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-[9px] uppercase tracking-widest block mb-1 opacity-60">Nama Data / Key</label>
+                            <input type="text" id="bKey" placeholder="e.g. suhu_ruangan" class="w-full p-2.5 rounded-lg text-xs font-mono">
+                        </div>
+                        <div>
+                            <label class="text-[9px] uppercase tracking-widest block mb-1 opacity-60">Tipe Widget</label>
+                            <select id="bType" class="w-full p-2.5 rounded-lg text-xs appearance-none">
+                                <option value="sensor">📡 Chart Sensor (Analog)</option>
+                                <option value="switch">⚡ Toggle Switch (ON/OFF)</option>
+                                <option value="dimmer">🎚️ Dimmer Slider (Value)</option>
+                            </select>
+                        </div>
+                        <div class="flex gap-2">
+                            <div class="flex-1">
+                                <label class="text-[9px] uppercase tracking-widest block mb-1 opacity-60">Satuan</label>
+                                <input type="text" id="bUnit" placeholder="e.g. °C" class="w-full p-2.5 rounded-lg text-xs text-center">
+                            </div>
+                            <div class="flex-1">
+                                <label class="text-[9px] uppercase tracking-widest block mb-1 opacity-60">Max Val</label>
+                                <input type="number" id="bMax" placeholder="e.g. 100" class="w-full p-2.5 rounded-lg text-xs text-center">
+                            </div>
+                        </div>
+                        <button id="btnSaveParam" class="btn-blue w-full py-3 rounded-xl text-xs font-semibold uppercase tracking-wider flex justify-center items-center gap-2 mt-2">
+                            <i class="fas fa-save"></i> Simpan Widget
+                        </button>
+                    </div>
+                </div>
+
+                <div class="glass-panel p-4 flex flex-col">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-[10px] opacity-70 uppercase tracking-[0.2em]"><i class="fas fa-terminal mr-1"></i> System Log</h3>
+                        <button id="btnClearLog" class="text-[9px] opacity-50 hover:opacity-100 transition"><i class="fas fa-trash"></i></button>
+                    </div>
+                    <div id="terminalLog" class="log-panel"></div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-8 flex flex-col gap-6">
+                
+                <div>
+                    <h3 class="text-xs opacity-70 mb-3 uppercase tracking-[0.2em] border-b border-white/10 pb-2"><i class="fas fa-chart-area mr-2"></i> Telemetry Sensors</h3>
+                    <div id="sensorGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="glass-panel p-6 text-center text-xs opacity-50 text-mono col-span-full">Menunggu koneksi database...</div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="text-xs opacity-70 mb-3 uppercase tracking-[0.2em] border-b border-white/10 pb-2"><i class="fas fa-toggle-on mr-2"></i> Digital Switches</h3>
+                        <div id="switchGrid" class="grid grid-cols-2 gap-4"></div>
+                    </div>
+                    <div>
+                        <h3 class="text-xs opacity-70 mb-3 uppercase tracking-[0.2em] border-b border-white/10 pb-2"><i class="fas fa-sliders-h mr-2"></i> Analog Dimmers</h3>
+                        <div id="dimmerGrid" class="flex flex-col gap-4"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp, getApps, deleteApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+        import { getDatabase, ref, onValue, update, remove, set } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
+
+        // --- CONSTANTS & STATE ---
+        const UART_SERVICE_UUID = "6e400001-b5a3-f393-e0a9-e50e24dcca9e";
+        const UART_TX_CHARACTERISTIC_UUID = "6e400002-b5a3-f393-e0a9-e50e24dcca9e";
+        const UART_RX_CHARACTERISTIC_UUID = "6e400003-b5a3-f393-e0a9-e50e24dcca9e";
+
+        const state = {
+            db: null, currentPath: "", unsubscribe: null, currentData: {}, historyData: {}, 
+            device: null, txChar: null, rxChar: null, bleConnected: false, bleBuffer: "",
+            editModeKey: null
+        };
+
+        const $ = (id) => document.getElementById(id);
+        const formatName = (str) => str.replace(/_/g, ' ').toUpperCase();
+
+        // --- TERMINAL LOGGER ---
+        function logMsg(msg, color = "#ccc") {
+            const time = new Date().toLocaleTimeString('id-ID', { hour12: false });
+            const html = `<div class="log-line"><span style="color:#555">[${time}]</span> <span style="color:${color}">${msg}</span></div>`;
+            $('terminalLog').insertAdjacentHTML('afterbegin', html);
+        }
+
+        // --- UI TRANSITIONS & INIT ---
+        window.onload = () => {
+            const saved = JSON.parse(localStorage.getItem('ryann_iot_cfg') || '{}');
+            if(saved.apiKey) {
+                $('apiKeyInput').value = saved.apiKey;
+                $('dbUrlInput').value = saved.dbUrl;
+                $('dbPathInput').value = saved.path || 'iot/kelas8';
+            }
+        };
+
+        $('btnLogin').onclick = async () => {
+            const apiKey = $('apiKeyInput').value.trim();
+            const dbUrl = $('dbUrlInput').value.trim();
+            const path = $('dbPathInput').value.trim();
+
+            if(!apiKey || !dbUrl || !path) { alert("Harap lengkapi semua data config Firebase!"); return; }
+
+            try {
+                // Initialize Firebase
+                const config = { apiKey, databaseURL: dbUrl, projectId: dbUrl.split('//')[1]?.split('.')[0] };
+                const apps = getApps();
+                if (apps.length > 0) await deleteApp(apps[0]);
+                
+                const app = initializeApp(config);
+                state.db = getDatabase(app);
+                state.currentPath = path;
+
+                // Save to local
+                localStorage.setItem('ryann_iot_cfg', JSON.stringify({apiKey, dbUrl, path}));
+
+                // Page Transition
+                $('loginPage').classList.add('hidden-page');
+                setTimeout(() => {
+                    $('dashboardPage').classList.remove('hidden-page');
+                    $('dashboardPage').classList.add('animate-slide');
+                    logMsg("Sistem RyannProject Aktif.", "#4182f3");
+                    logMsg(`Syncing Database: /${path}`, "#a0c4ff");
+                }, 500);
+
+                // DB Status Update
+                $('dbDot').className = "w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]";
+                $('dbText').innerText = "DB LIVE";
+
+                // Listen DB Changes
+                if(state.unsubscribe) state.unsubscribe();
+                state.unsubscribe = onValue(ref(state.db, path), (snapshot) => {
+                    state.currentData = snapshot.val() || {};
+                    renderDashboard(state.currentData);
+                });
+
+            } catch(e) {
+                alert(`Gagal konek Firebase: ${e.message}`);
+            }
+        };
+
+        // --- BLUETOOTH LOGIC ---
+        $('btnConnectBle').onclick = async () => {
+            try {
+                if (!navigator.bluetooth) throw new Error("Browser tidak mensupport Web Bluetooth.");
+                logMsg("Mencari perangkat Micro:bit...", "#facc15");
+                
+                state.device = await navigator.bluetooth.requestDevice({
+                    filters: [{ namePrefix: "BBC" }],
+                    optionalServices: [UART_SERVICE_UUID]
+                });
+                
+                state.device.addEventListener("gattserverdisconnected", () => {
+                    state.bleConnected = false; updateBleUI(); logMsg("Micro:bit Terputus!", "#ef4444");
+                });
+
+                const server = await state.device.gatt.connect();
+                const service = await server.getPrimaryService(UART_SERVICE_UUID);
+                
+                state.txChar = await service.getCharacteristic(UART_TX_CHARACTERISTIC_UUID);
+                state.rxChar = await service.getCharacteristic(UART_RX_CHARACTERISTIC_UUID);
+                
+                await state.txChar.startNotifications();
+                state.txChar.addEventListener("characteristicvaluechanged", handleBLEData);
+                
+                state.bleConnected = true; updateBleUI();
+                logMsg(`Berhasil terhubung ke ${state.device.name}`, "#34d399");
+            } catch (e) {
+                logMsg(`BLE Error: ${e.message}`, "#ef4444");
+            }
+        };
+
+        $('btnDisconnectBle').onclick = () => { if(state.device) state.device.gatt.disconnect(); };
+
+        function updateBleUI() {
+            $('btnConnectBle').disabled = state.bleConnected;
+            $('btnDisconnectBle').disabled = !state.bleConnected;
+            if(state.bleConnected) {
+                $('bleDot').className = "w-2 h-2 rounded-full bg-blue-400 shadow-[0_0_8px_#60a5fa]";
+                $('bleText').innerText = "BLE LIVE";
+            } else {
+                $('bleDot').className = "w-2 h-2 rounded-full bg-red-500 shadow-[0_0_8px_#ef4444]";
+                $('bleText').innerText = "BLE OFF";
+            }
+        }
+
+        function handleBLEData(event) {
+            let arr = [];
+            for (let i = 0; i < event.target.value.byteLength; i++) arr.push(event.target.value.getUint8(i));
+            state.bleBuffer += String.fromCharCode.apply(null, arr);
+            
+            const lines = state.bleBuffer.split('\n');
+            state.bleBuffer = lines.pop(); 
+            
+            lines.forEach(line => {
+                const txt = line.trim();
+                if (txt) processIncomingSensor(txt);
+            });
+        }
+
+        // --- KECERDASAN OTOMATIS WIDGET ---
+        function processIncomingSensor(txt) {
+            logMsg(`RX < ${txt}`, "#4182f3");
+            if (!state.db) return;
+
+            if (txt.includes(':')) {
+                const parts = txt.split(':');
+                let key = parts[0].trim().replace(/\s+/g, '_').toLowerCase();
+                const val = parseFloat(parts[1].trim());
+
+                if (key === "mode") key = "otomatis"; 
+
+                let autoType = "sensor"; 
+                if (key === "lampu" || key === "otomatis") autoType = "switch"; 
+                if (key === "kipas") autoType = "dimmer"; 
+
+                if (!isNaN(val)) {
+                    if (state.currentData[key]) {
+                        update(ref(state.db, `${state.currentPath}/${key}`), { value: val });
+                    } else {
+                        logMsg(`Auto-create widget ${autoType}: ${key}`, "#facc15");
+                        set(ref(state.db, `${state.currentPath}/${key}`), { 
+                            tipe: autoType, value: val, satuan: "", batas_atas: autoType==="dimmer"?1024:100 
+                        });
+                    }
+                }
+            }
+        }
+
+        // --- KIRIM DATA KE MICRO:BIT ---
+        async function sendToMicrobit(key, val) {
+            if (!state.rxChar) { logMsg("Kirim gagal: Micro:bit belum konek", "#ef4444"); return; }
+            const payload = `${key},${val}\n`; // Format: key,value\n (Sesuai Teacher Code)
+            try {
+                await state.rxChar.writeValue(new TextEncoder().encode(payload));
+                logMsg(`TX > ${payload.trim()}`, "#a0c4ff");
+            } catch(e) { logMsg(`TX Error: ${e.message}`, "#ef4444"); }
+        }
+
+        // --- RENDER DASHBOARD (THE UI GENERATOR) ---
+        function renderDashboard(data) {
+            const keys = Object.keys(data);
+            if(keys.length === 0) {
+                $('sensorGrid').innerHTML = `<div class="glass-panel p-6 text-center text-xs opacity-50 col-span-full">Database masih kosong. Gunakan builder / kirim data dari Micro:bit.</div>`;
+                $('switchGrid').innerHTML = ''; $('dimmerGrid').innerHTML = '';
+                return;
+            }
+
+            const sensors = keys.filter(k => data[k].tipe === 'sensor');
+            const switches = keys.filter(k => data[k].tipe === 'switch');
+            const dimmers = keys.filter(k => data[k].tipe === 'dimmer');
+
+            renderSensors(sensors, data);
+            renderSwitches(switches, data);
+            renderDimmers(dimmers, data);
+        }
+
+        function generateControlsHTML(key) {
+            return `
+                <div class="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button class="text-blue-300 hover:text-white transition" onclick="window.editParam('${key}')"><i class="fas fa-edit"></i></button>
+                    <button class="text-red-400 hover:text-red-500 transition" onclick="window.deleteParam('${key}')"><i class="fas fa-trash"></i></button>
+                </div>
+            `;
+        }
+
+        function renderSensors(keys, data) {
+            const grid = $('sensorGrid');
+            // Bersihkan elemen yang tidak ada di db
+            Array.from(grid.children).forEach(el => { if(el.id && !keys.includes(el.id.replace('s-',''))) el.remove(); });
+            if(keys.length > 0 && grid.innerHTML.includes("Database masih kosong")) grid.innerHTML = '';
+
+            keys.forEach(key => {
+                const item = data[key];
+                let card = $(`s-${key}`);
+                
+                if(!state.historyData[key]) state.historyData[key] = [];
+                state.historyData[key].push(item.value);
+                if(state.historyData[key].length > 25) state.historyData[key].shift();
+
+                if (!card) {
+                    const html = `
+                        <div class="glass-panel p-6 flex flex-col relative group animate-slide" id="s-${key}">
+                            ${generateControlsHTML(key)}
+                            <h3 class="text-[10px] opacity-60 tracking-widest mb-4 uppercase">${formatName(key)}</h3>
+                            <div class="flex items-baseline gap-2 mb-2">
+                                <div class="text-5xl font-light tracking-tighter text-white" id="s-val-${key}">${item.value}</div>
+                                <div class="text-xs text-blue-300 font-bold">${item.satuan || ''}</div>
+                            </div>
+                            <div class="w-full h-16 mt-auto"><canvas id="canvas-${key}"></canvas></div>
+                        </div>
+                    `;
+                    grid.insertAdjacentHTML('beforeend', html);
+                } else {
+                    $(`s-val-${key}`).innerText = item.value;
+                }
+                drawCanvasChart(key, state.historyData[key], item.batas_atas || 100);
+            });
+        }
+
+        function renderSwitches(keys, data) {
+            const grid = $('switchGrid');
+            grid.innerHTML = keys.length === 0 ? '<div class="col-span-full text-[10px] opacity-40">No switches available.</div>' : '';
+            
+            keys.forEach(key => {
+                const item = data[key];
+                const isOn = (item.value == 1 || item.value === true);
+                const activeClass = isOn ? 'switch-active' : 'switch-inactive';
+                
+                const html = `
+                    <div class="glass-panel p-5 text-center cursor-pointer relative group transition-all duration-300 hover:-translate-y-1 ${activeClass}" onclick="window.toggleSwitch('${key}', ${isOn ? 0 : 1})">
+                        ${generateControlsHTML(key)}
+                        <i class="fas fa-power-off text-2xl mb-3 transition-colors"></i>
+                        <div class="text-[10px] opacity-70 tracking-widest uppercase mb-1">${formatName(key)}</div>
+                        <div class="font-bold tracking-wider ${isOn ? 'text-white' : 'text-white/40'}">${isOn ? 'ON' : 'OFF'}</div>
+                    </div>
+                `;
+                grid.insertAdjacentHTML('beforeend', html);
+            });
+        }
+
+        function renderDimmers(keys, data) {
+            const grid = $('dimmerGrid');
+            grid.innerHTML = keys.length === 0 ? '<div class="col-span-full text-[10px] opacity-40">No dimmers available.</div>' : '';
+            
+            keys.forEach(key => {
+                const item = data[key];
+                const max = item.batas_atas || 1024;
+                
+                const html = `
+                    <div class="glass-panel p-5 relative group">
+                        ${generateControlsHTML(key)}
+                        <div class="flex justify-between items-end mb-4">
+                           <div class="text-[10px] opacity-70 tracking-widest uppercase">${formatName(key)}</div>
+                           <div class="text-sm font-bold text-blue-300">${item.value} <span class="text-[9px] opacity-50 text-white">/ ${max}</span></div>
+                        </div>
+                        <input type="range" min="0" max="${max}" value="${item.value}" onchange="window.changeDimmer('${key}', this.value)">
+                    </div>
+                `;
+                grid.insertAdjacentHTML('beforeend', html);
+            });
+        }
+
+        // --- CHART DRAWING (CUSTOM CANVAS, NO EXTERNAL LIB REQUIRED) ---
+        function drawCanvasChart(key, values, maxConfig) {
+            const cvs = $(`canvas-${key}`);
+            if(!cvs) return;
+            // Handle DPI for sharp render
+            const rect = cvs.parentElement.getBoundingClientRect();
+            cvs.width = rect.width; cvs.height = rect.height;
+            
+            const ctx = cvs.getContext('2d');
+            const w = cvs.width, h = cvs.height;
+            ctx.clearRect(0,0,w,h);
+            if(values.length < 2) return;
+
+            const maxVal = Math.max(...values, 10);
+            const max = Math.max(maxVal + (maxVal*0.2), maxConfig/2); 
+            const pad = 2;
+            const plotW = w - pad*2; const plotH = h - pad*2;
+            const step = plotW / (values.length - 1);
+
+            // Fill area
+            ctx.beginPath();
+            values.forEach((v, i) => {
+                const x = pad + i*step; const y = pad + plotH - ((v/max)*plotH);
+                if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+            });
+            ctx.lineTo(pad+plotW, pad+plotH); ctx.lineTo(pad, pad+plotH);
+            ctx.closePath();
+            
+            let gradient = ctx.createLinearGradient(0, 0, 0, h);
+            gradient.addColorStop(0, 'rgba(65, 130, 243, 0.4)');
+            gradient.addColorStop(1, 'rgba(65, 130, 243, 0)');
+            ctx.fillStyle = gradient; 
+            ctx.fill();
+
+            // Line
+            ctx.beginPath();
+            values.forEach((v, i) => {
+                const x = pad + i*step; const y = pad + plotH - ((v/max)*plotH);
+                if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+            });
+            ctx.strokeStyle = "#a0c4ff"; ctx.lineWidth = 2; 
+            ctx.lineJoin = 'round'; ctx.stroke();
+        }
+
+        // --- GLOBAL WINDOW FUNCTIONS FOR HTML INLINE HANDLERS ---
+        window.toggleSwitch = async (key, newVal) => {
+            if(!state.db) return;
+            await update(ref(state.db, `${state.currentPath}/${key}`), { value: newVal });
+            sendToMicrobit(key, newVal);
+        };
+
+        window.changeDimmer = async (key, newVal) => {
+            if(!state.db) return;
+            await update(ref(state.db, `${state.currentPath}/${key}`), { value: parseInt(newVal) });
+            sendToMicrobit(key, parseInt(newVal));
+        };
+
+        window.deleteParam = async (key) => {
+            if(confirm(`Hapus parameter [${formatName(key)}] secara permanen?`)) {
+                await remove(ref(state.db, `${state.currentPath}/${key}`));
+                if(state.historyData[key]) delete state.historyData[key];
+                logMsg(`Widget Dihapus: ${key}`, "#ef4444");
+            }
+        };
+
+        window.editParam = (key) => {
+            const item = state.currentData[key];
+            if(!item) return;
+            $('bKey').value = key; $('bKey').readOnly = true; $('bKey').style.opacity = '0.5';
+            $('bType').value = item.tipe || 'sensor';
+            $('bUnit').value = item.satuan || '';
+            $('bMax').value = item.batas_atas || '';
+            
+            state.editModeKey = key;
+            $('btnCancelEdit').classList.remove('hidden');
+            $('btnSaveParam').innerHTML = '<i class="fas fa-check"></i> Update Widget';
+        };
+
+        $('btnCancelEdit').onclick = () => {
+            $('bKey').value = ''; $('bKey').readOnly = false; $('bKey').style.opacity = '1';
+            $('bUnit').value = ''; $('bMax').value = '';
+            state.editModeKey = null;
+            $('btnCancelEdit').classList.add('hidden');
+            $('btnSaveParam').innerHTML = '<i class="fas fa-save"></i> Simpan Widget';
+        };
+
+        $('btnSaveParam').onclick = async () => {
+            if(!state.db) { alert("Harap login & konek Firebase dulu!"); return; }
+            let key = $('bKey').value.trim().replace(/\s+/g, '_').toLowerCase();
+            if(!key) { alert("Key tidak boleh kosong!"); return;}
+
+            const payload = {
+                tipe: $('bType').value,
+                satuan: $('bUnit').value.trim(),
+                batas_atas: parseInt($('bMax').value) || ($('bType').value === 'dimmer'? 1024 : 100),
+                value: state.editModeKey ? state.currentData[state.editModeKey].value : 0
+            };
+
+            try {
+                await set(ref(state.db, `${state.currentPath}/${key}`), payload);
+                logMsg(`Widget Tersimpan: ${key}`, "#34d399");
+                $('btnCancelEdit').onclick(); // trigger reset
+            } catch(e) { logMsg(`Save Error: ${e.message}`, "#ef4444"); }
+        };
+
+        $('btnClearLog').onclick = () => $('terminalLog').innerHTML = '';
+
+    </script>
+</body>
+</html>
